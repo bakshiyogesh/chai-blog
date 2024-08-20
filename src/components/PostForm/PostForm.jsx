@@ -8,7 +8,7 @@ export default function PostForm({ postData }) {
   const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
     defaultValues: {
       title: postData?.title || '',
-      slug: postData?.slug || '',
+      slug: postData?.$id || '',
       content: postData?.content || '',
       status: postData?.status || 'active',
     },
@@ -30,15 +30,25 @@ export default function PostForm({ postData }) {
       if (dbPost) {
         navigate(`/post/${dbPost.$id}`);
       } else {
+        const file = await appwiteBlogService.uploadFile(data.image[0]);
+        // if (file) {
+        //   const imageFile = data.image[0] ? await appwiteBlogService.uploadFile(data.image[0]) : null;
+        //   if (imageFile) {
+        //     const fileId = imageFile.$id;
+        //     data.featuredImage = fileId;
+        //     const dbPost = await appwiteBlogService.createPost({ ...data, userId: userData.$id });
+        //     if (dbPost) {
+        //       navigate(`/post/${dbPost.$id}`);
+        //     }
+        //   }
+        // }
         if (file) {
-          const imageFile = data.image[0] ? await appwiteBlogService.uploadFile(data.image[0]) : null;
-          if (imageFile) {
-            const fileId = imageFile.$id;
-            data.featuredImage = fileId;
-            const dbPost = await appwiteBlogService.createPost({ ...data, userId: userData.$id });
-            if (dbPost) {
-              navigate(`/post/${dbPost.$id}`);
-            }
+          const fileId = file.$id;
+          data.featuredImage = fileId;
+          const dbPost = await appwiteBlogService.createPost({ ...data, userId: userData.$id });
+
+          if (dbPost) {
+            navigate(`/post/${dbPost.$id}`);
           }
         }
       }
@@ -53,26 +63,26 @@ export default function PostForm({ postData }) {
         .replace(/^[a-zA-Z\d\s]+/g, '-')
         .replace(/\s/g, '-');
     return '';
-  });
+  }, []);
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
       if (name === 'title') {
-        setValue('slug', slugTransForm(value.title, { shouldValidate: true }));
+        setValue('slug', slugTransForm(value.title), { shouldValidate: true });
       }
     });
 
-    return () => subscription.unsubscibe();
+    return () => subscription.unsubscribe();
   }, [watch, slugTransForm, setValue]);
   return (
     <>
-      <form onSubmit={handleSubmit(submit)} className='flex-wrap'>
+      <form onSubmit={handleSubmit(submit)} className='flex flex-wrap'>
         <div className='w-2/3 px-2'>
           <Input label='Title' placeholder='Title' className='mb-4' {...register('title', { required: true })} />
 
           <Input
             label='Slug'
-            placeholder='slug'
+            placeholder='Slug'
             className='mb-4'
             {...register('slug', { required: true })}
             onInput={(e) => {
