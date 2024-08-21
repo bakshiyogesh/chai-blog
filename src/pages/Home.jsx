@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Container, PostCard } from '../components';
 import appwiteBlogService from '../appwrite/blog';
+import { useSelector } from 'react-redux';
 function Home() {
   const [posts, setPosts] = useState([]);
+  const authStatus = useSelector((state) => state.auth.status);
 
   useEffect(() => {
     appwiteBlogService.getPosts().then((posts) => {
@@ -12,7 +14,7 @@ function Home() {
     });
   });
 
-  if (posts.length === 0) {
+  if (posts.length === 0 && !authStatus) {
     return (
       <div className='w-full py-8 mt-4 text-center'>
         <Container>
@@ -24,8 +26,13 @@ function Home() {
         </Container>
       </div>
     );
+  } else if (authStatus && posts.length === 0) {
+    return (
+      <div className='w-full  flex justify-center items-center h-full'>
+        <h2 className='text-blue-50 font-serif '>No article found to show . Please create your first blog article</h2>
+      </div>
+    );
   }
-
   return (
     <div className='w-full py-8'>
       <Container>

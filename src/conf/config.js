@@ -4,8 +4,7 @@ const conf = {
   databaseID: String(import.meta.env.VITE_APPWRITE_DATABASE_ID),
   bucketID: String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
   collectionID: String(import.meta.env.VITE_APPWRITE_COLLECTION_ID),
+  tinyMCEConfig: String(import.meta.env.VITE_TINY_MCE_KEY),
 };
-console.log(conf, 'conf');
-const apiURL = import.meta.env.VITE_API_URL;
-console.log(apiURL, 'apiURL');
+
 export default conf;

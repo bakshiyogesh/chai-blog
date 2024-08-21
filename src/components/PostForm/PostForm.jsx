@@ -14,11 +14,12 @@ export default function PostForm({ postData }) {
     },
   });
   const navigate = useNavigate();
-  const userData = useSelector((state) => state.user.userData);
+  const userData = useSelector((state) => state.auth.userData);
 
   const submit = async (data) => {
     if (postData) {
       const file = data.image[0] ? await appwiteBlogService.uploadFile(data.image[0]) : null;
+      console.log(file, 'file');
       if (file) {
         await appwiteBlogService.deleteFile(postData.featuredImage);
       }
@@ -26,7 +27,6 @@ export default function PostForm({ postData }) {
         ...data,
         featuredImage: file ? file.$id : undefined,
       });
-
       if (dbPost) {
         navigate(`/post/${dbPost.$id}`);
       } else {

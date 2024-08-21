@@ -5,7 +5,11 @@ function AllPost() {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {}, []);
-  appwiteBlogService.getPosts([]).then((posts) => (posts.length > 0 ? setPosts(posts) : setPosts([])));
+  appwiteBlogService.getPosts([]).then((posts) => {
+    if (posts) {
+      setPosts(posts.documents);
+    }
+  });
   return (
     <div className='py-8'>
       <Container>
