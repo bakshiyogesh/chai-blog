@@ -5,12 +5,13 @@ import { Button, Input } from './index';
 import authService from '../appwrite/auth';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
+import toast, { Toaster } from 'react-hot-toast';
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState('');
-
+  const toastSuccess = (message) => toast.success(message, { position: 'top-right' });
   const login = async (data) => {
     setError('');
     try {
@@ -19,6 +20,7 @@ export default function Login() {
         const userData = await authService.getCurrentUser();
         if (userData) {
           dispatch(authLogin(userData));
+          toastSuccess('Login  successfully');
           navigate('/');
         }
       }
@@ -61,6 +63,18 @@ export default function Login() {
                   matchPatern: (passwd) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm.test(passwd) || 'Password must contain at least 8 characters,1 uppercase letter,1 lowercase letter 1 number and special characters',
                 },
               })}
+            />
+            <Toaster
+              position='bottom-left'
+              toastOptions={{
+                duration: 3000,
+                role: 'status',
+                ariaLive: 'polite',
+                style: {
+                  background: 'green',
+                  color: 'whitesmoke',
+                },
+              }}
             />
             <Button type='submit'> Sign in</Button>
           </div>

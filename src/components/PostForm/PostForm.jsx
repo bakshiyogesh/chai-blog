@@ -13,43 +13,79 @@ export default function PostForm({ postData }) {
       status: postData?.status || 'active',
     },
   });
+  console.log('postdata', postData);
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
 
+  // const submit = async (data) => {
+  //   console.log('data', data);
+  //   if (postData) {
+  //     const file = data.image[0] ? await appwiteBlogService.uploadFile(data.image[0]) : null;
+  //     console.log(file, 'file');
+  //     if (file) {
+  //       await appwiteBlogService.deleteFile(postData.featuredImage);
+  //     }
+  //     const dbPost = await appwiteBlogService.updatePost(postData.$id, {
+  //       ...data,
+  //       featuredImage: file ? file.$id : undefined,
+  //     });
+  //     if (dbPost) {
+  //       navigate(`/post/${dbPost.$id}`);
+  //     } else {
+  //       const file = await appwiteBlogService.uploadFile(data.image[0]);
+  //       // if (file) {
+  //       //   const imageFile = data.image[0] ? await appwiteBlogService.uploadFile(data.image[0]) : null;
+  //       //   if (imageFile) {
+  //       //     const fileId = imageFile.$id;
+  //       //     data.featuredImage = fileId;
+  //       //     const dbPost = await appwiteBlogService.createPost({ ...data, userId: userData.$id });
+  //       //     if (dbPost) {
+  //       //       navigate(`/post/${dbPost.$id}`);
+  //       //     }
+  //       //   }
+  //       // }
+  //       if (file) {
+  //         const fileId = file.$id;
+  //         data.featuredImage = fileId;
+  //         const dbPost = await appwiteBlogService.createPost({ ...data, userId: userData.$id });
+
+  //         if (dbPost) {
+  //           navigate(`/post/${dbPost.$id}`);
+  //         }
+  //       }
+  //     }
+  //   }
+  // };
+
   const submit = async (data) => {
+    data.slug = slugTransForm(data.title);
     if (postData) {
       const file = data.image[0] ? await appwiteBlogService.uploadFile(data.image[0]) : null;
-      console.log(file, 'file');
+
       if (file) {
-        await appwiteBlogService.deleteFile(postData.featuredImage);
+        appwiteBlogService.deleteFile(postData.featuredImage);
       }
+
       const dbPost = await appwiteBlogService.updatePost(postData.$id, {
         ...data,
         featuredImage: file ? file.$id : undefined,
       });
+
       if (dbPost) {
         navigate(`/post/${dbPost.$id}`);
-      } else {
-        const file = await appwiteBlogService.uploadFile(data.image[0]);
-        // if (file) {
-        //   const imageFile = data.image[0] ? await appwiteBlogService.uploadFile(data.image[0]) : null;
-        //   if (imageFile) {
-        //     const fileId = imageFile.$id;
-        //     data.featuredImage = fileId;
-        //     const dbPost = await appwiteBlogService.createPost({ ...data, userId: userData.$id });
-        //     if (dbPost) {
-        //       navigate(`/post/${dbPost.$id}`);
-        //     }
-        //   }
-        // }
-        if (file) {
-          const fileId = file.$id;
-          data.featuredImage = fileId;
-          const dbPost = await appwiteBlogService.createPost({ ...data, userId: userData.$id });
+      }
+    } else {
+      const file = await appwiteBlogService.uploadFile(data.image[0]);
 
-          if (dbPost) {
-            navigate(`/post/${dbPost.$id}`);
-          }
+      if (file) {
+        const fileId = file.$id;
+        data.featuredImage = fileId;
+        console.log(data, 'data', userData.$id);
+        const dbPost = await appwiteBlogService.createPost({ ...data, userId: userData.$id });
+        console.log(dbPost, 'dbpost');
+
+        if (dbPost) {
+          navigate(`/post/${dbPost.$id}`);
         }
       }
     }
@@ -78,12 +114,12 @@ export default function PostForm({ postData }) {
     <>
       <form onSubmit={handleSubmit(submit)} className='flex flex-wrap'>
         <div className='w-2/3 px-2'>
-          <Input label='Title' placeholder='Title' className='mb-4' {...register('title', { required: true })} />
+          <Input label='Title' placeholder='Title' className='mb-4 mr-4' {...register('title', { required: true })} />
 
           <Input
             label='Slug'
             placeholder='Slug'
-            className='mb-4'
+            className='mb-4 mr-4'
             {...register('slug', { required: true })}
             onInput={(e) => {
               setValue('slug', slugTransForm(e.currentTarget.value), {
@@ -100,7 +136,7 @@ export default function PostForm({ postData }) {
               <img src={appwiteBlogService.getFilePreview(postData.featuredImage)} alt={postData.title} className='rounded-lg' />
             </div>
           )}
-          <Select options={['active', 'inactive']} label='Status' className='mb-4' {...register('status', { required: true })} />
+          <Select options={['active', 'inactive']} label='Status' className='mb-4  mt-4' {...register('status', { required: true })} />
           <Button type='submit' bgColor={postData ? 'bg-green-500' : undefined} className='w-full'>
             {postData ? 'Update' : 'Submit'}
           </Button>

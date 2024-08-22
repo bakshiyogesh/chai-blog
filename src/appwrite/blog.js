@@ -10,11 +10,29 @@ export class BlogService {
     this.databases = new Databases(this.client);
     this.bucket = new Storage(this.client);
   }
-  async createPost({ title, slug, content, featuredImage, status = 'active', userId }) {
+  // async createPost({ title, slug, content, featuredImage, status = 'active', userId }) {
+  //   try {
+  //     console.log('createPost', userId);
+  //     return await this.databases.createDocument(conf.databaseID, conf.collectionID, slug, { title, content, featuredImage, status, userId });
+  //   } catch (error) {
+  //     console.log('Appwrite serive :: createPost :: error', error);
+  //   }
+  // }
+
+  async createPost({ title, slug, content, featuredImage, status, userId }) {
     try {
-      return await this.databases.createDocument(conf.databaseID, conf.collectionID, slug, { title, content, featuredImage, status, userId });
+      // const documentId = `temp-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      const data = await this.databases.createDocument(conf.databaseID, conf.collectionID, slug, {
+        title,
+        content,
+        featuredImage,
+        status,
+        userId,
+      });
+      console.log(data, 'data crrate post');
+      return data;
     } catch (error) {
-      console.log(error);
+      console.log('Appwrite serive :: createPost :: error', error);
     }
   }
 
@@ -27,7 +45,7 @@ export class BlogService {
         status,
       });
     } catch (error) {
-      console.log(error);
+      console.log('Appwrite serive :: updatePost :: error', error);
     }
   }
 
@@ -36,7 +54,7 @@ export class BlogService {
       await this.databases.deleteDocument(conf.databaseID, conf.collectionID, slug);
       return true;
     } catch (error) {
-      console.log(error);
+      console.log('Appwrite serice :: deletePost :: error', error);
       return false;
     }
   }
@@ -45,7 +63,7 @@ export class BlogService {
     try {
       return this.databases.getDocument(conf.databaseID, conf.collectionID, slug);
     } catch (error) {
-      console.log(error);
+      console.log('Appwrite serive :: getPost :: error', error);
       return false;
     }
   }
@@ -54,7 +72,7 @@ export class BlogService {
     try {
       return await this.databases.listDocuments(conf.databaseID, conf.collectionID, queries);
     } catch (error) {
-      console.log(error);
+      console.log('Appwrite serice :: getPosts :: error', error);
     }
   }
 
@@ -64,7 +82,7 @@ export class BlogService {
       // }
       return await this.bucket.createFile(conf.bucketID, ID.unique(), file);
     } catch (error) {
-      console.log(error);
+      console.log('Appwrite serice :: uploadFile :: error', error);
     }
   }
 
@@ -72,7 +90,7 @@ export class BlogService {
     try {
       return await this.bucket.deleteFile(conf.bucketID, fileId);
     } catch (error) {
-      console.log(error);
+      console.log('Appwrite serice :: deletefile :: error', error);
     }
   }
 
@@ -80,7 +98,7 @@ export class BlogService {
     try {
       return await this.bucket.getFilePreview(conf.bucketID, fileId);
     } catch (error) {
-      console.log(error);
+      console.log('Appwrite serice :: filePreview :: error', error);
     }
   }
 }
